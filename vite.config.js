@@ -16,7 +16,7 @@ export default defineConfig({
     },
     cssCodeSplit: false, // 不单独输出 .css 文件，这里采用的 ?inline 字符串嵌入方案
     outDir: 'dist',
-    minify: false, // (可选)
+    // minify: false, // (可选, 默认true)
   },
   define: { // 无 node 环境
     'process.env.NODE_ENV': JSON.stringify('production'),
