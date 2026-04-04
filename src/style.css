@@ -1,0 +1,10 @@
+/**
+ * Plugin: hello-world
+ * 这里可以写插件用到的样式
+ * 构建后会被 inline 注入到 JS 中（vite-plugin-css-injected-by-js）
+ */
+
+.am-plugin-hello-world {
+  color: #4a9eff;
+  font-weight: bold;
+}
