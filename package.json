@@ -1,7 +1,7 @@
 {
-  "name": "any-menu-plugin-simple",
+  "name": "any-menu-plugin-react",
   "version": "1.0.0",
-  "description": "AnyMenu simple plugin example",
+  "description": "AnyMenu simple plugin example based on React.",
   "keywords": [
     "any-menu",
     "anymenu",

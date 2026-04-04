@@ -1,4 +1,4 @@
-# AnyMenu Plugin Simple
+# AnyMenu Plugin React
 
 > 这是 [AnyMenu](https://github.com/any-menu/any-menu) 的插件开发模板
 
@@ -20,85 +20,178 @@ $ npm run build
 
 ## 从零生成此项目 (可选)
 
-可选阅读，仅推荐有需要自定义插件模板的查看 (如需要开发有 Vue/React 等依赖的插件模板)
+(1) 基于 plugin-simple
 
-(1) git 环境 (可选)
+先基于 [any-menu/example-plugin-simple](https://github.com/any-menu/example-plugin-simple) 的从零生成说明
+
+然后使用 react:
+
+(2) 添加 react 依赖
 
 ```bash
-$ git init
-# 并创建和修改 .gitignore
+npm install react react-dom
+npm install -D @types/react @types/react-dom
 ```
 
-(2) npm 环境
+(3) 配置构建工具以支持 React JSX/TSX
 
-```bash
-$ npm init
-This utility will walk you through creating a package.json file.
-It only covers the most common items, and tries to guess sensible defaults.
+- 如果之前的项目基于 webpack：
 
-See `npm help init` for definitive documentation on these fields
-and exactly what they do.
+  ```bash
+  npm install -D webpack babel-loader @babel/core @babel/preset-react @babel/preset-typescript
+  ```
 
-Use `npm install <pkg>` afterwards to install a package and
-save it as a dependency in the package.json file.
+  webpack.config.js 配置示例：
 
-Press ^C at any time to quit.
-package name: (anymenu-plugin-simple)
-version: (1.0.0)
-description: AnyMenu simple plugin example
-entry point: (index.js)
-test command:
-git repository:
-keywords: anymenu
-author:
-license: (ISC) MIT
-type: (commonjs) module
-About to write to H:\Git\Private\Group_AnyMenu\anymenu-plugin-simple\package.json:
+  ```js
+  // webpack.config.js
+  module.exports = {
+    resolve: {
+      extensions: ['.js', '.jsx', '.ts', '.tsx']
+    },
+    module: {
+      rules: [
+        {
+          test: /\.[jt]sx?$/,
+          exclude: /node_modules/,
+          use: {
+            loader: 'babel-loader',
+            options: {
+              presets: [
+                '@babel/preset-react',
+                '@babel/preset-typescript'
+              ]
+            }
+          }
+        },
+        // 其他规则...
+      ]
+    },
+    // 其他配置...
+  }
+  ```
 
+- 如果之前的项目基于 vite：
+
+  ```bash
+  npm install -D vite @vitejs/plugin-react
+  ```
+
+  vite.config.js 配置示例：
+
+  ```js
+  // vite.config.js
+  import { defineConfig } from 'vite';
+  import react from '@vitejs/plugin-react';
+
+  export default defineConfig({
+    plugins: [react()]
+  });
+  ```
+
+(4) 配置 tsconfig.json 以支持 JSX
+
+在 `tsconfig.json` 中添加或修改以下配置：
+
+```json
 {
-  "name": "anymenu-plugin-simple",
-  "version": "1.0.0",
-  "description": "AnyMenu simple plugin example",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [
-    "anymenu"
-  ],
-  "author": "",
-  "license": "MIT",
-  "type": "module"
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "esModuleInterop": true
+  }
 }
-
-
-Is this OK? (yes)
 ```
 
-(3) typescript 和 vite 环境
+(5) 使用 React 挂载到面板元素
 
-```bash
-# 可参考当前项目的 package.json
+假设面板入口文件为 index.ts：
 
-$ npm install -D typescript vite
+- React 18+ 写法 (推荐):
 
-# 替换 package.json 的 scripts (使用 vite 和 typescript)
-# 添加 tsconfig.json
-# 添加 vite.config.js
+  ```tsx
+  import { createRoot } from 'react-dom/client';
+  import SubPanel from './SubPanel';
+
+  const newPanel = document.createElement('div');
+  ctx.api.registerSubPanel({
+    id: 'example-plugin-react-panel',
+    el: newPanel
+  });
+
+  // 使用 React 渲染
+  const root = createRoot(newPanel);
+  root.render(<SubPanel />);
+  ```
+
+- React 17 及更早写法:
+
+  ```tsx
+  import ReactDOM from 'react-dom';
+  import SubPanel from './SubPanel';
+
+  const newPanel = document.createElement('div');
+  ctx.api.registerSubPanel({
+    id: 'example-plugin-react-panel',
+    el: newPanel
+  });
+
+  // 使用 React 渲染
+  ReactDOM.render(<SubPanel />, newPanel);
+  ```
+
+(6) 创建一个示例组件
+
+SubPanel.tsx:
+
+```tsx
+import { useState } from 'react';
+
+export default function SubPanel() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <div>
+      <h3>Hello from React Plugin!</h3>
+      <p>Count: {count}</p>
+      <button onClick={() => setCount(count + 1)}>+1</button>
+    </div>
+  );
+}
 ```
 
-(4) 程序文件
+(7) (可选) 卸载时清理 React 组件
 
-```bash
-# 然后是文件准备
+当插件被禁用或卸载时，应当正确清理 React 渲染树以避免内存泄漏：
 
-# (1) typescript 类型
-# 复制 any-menu/any-menu 项目的 src/Core/PluginInterface.ts 接口到 /types/any-menu.d.ts
-# 或复制该项目的 /types/any-menu.d.ts
-# 或等待后期这一步会转而使用 npm 类型依赖包来实现
-# 
-# 当然，如果你使用 js 来编写则不需要这一步，直接仿照官方的 js 示例插件来编写就可以了
+- React 18+:
 
-# (2) 创建和编写 src/ 文件夹内的内容 (主要程序代码和样式文件)
-# 特殊：这里使用的特殊的方式将 css 文件转为字符串附加到 js 上，这样能方便你更好地利用代码着色功能编辑 js 文件
-```
+  ```ts
+  // 卸载
+  root.unmount();
+  ```
+
+- React 17 及更早:
+
+  ```ts
+  // 卸载
+  ReactDOM.unmountComponentAtNode(newPanel);
+  ```
+
+(8) (可选) React 18 与 React 17 及更早的一些差异
+
+该项目使用的是 React 18+，版本 18 和 17 的一些用法有些不同
+
+- React 18+
+  详见 [官方文档-createRoot](https://react.dev/reference/react-dom/client/createRoot)
+  ```js
+  import { createRoot } from 'react-dom/client';
+  const root = createRoot(container);
+  root.render(<App />);
+  ```
+- React 17 及更早
+  ```js
+  import ReactDOM from 'react-dom';
+  ReactDOM.render(<App />, container);
+  ```
+
+React 18 引入了并发特性 (Concurrent Features)，使用 `createRoot` 是启用这些新特性的前提。如果使用旧的 `ReactDOM.render`，React 18 会以兼容模式 (legacy mode) 运行，不会启用并发特性。
