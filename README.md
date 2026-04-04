@@ -33,7 +33,16 @@ npm install react react-dom
 npm install -D @types/react @types/react-dom
 ```
 
-(3) 配置构建工具以支持 React JSX/TSX
+(3) 修改 vite.config.js 的 define
+
+做法参考 vite.config.js 的 define
+
+主要是使其脱离 process (node.js) 依赖，否则编译结果 main.js 中会直接使用只能在 node.js 环境中使用的 node。
+AnyMenu 加载插件时会报错: `Caused by: ReferenceError: process is not defined`
+
+此外，如此也能大大减少编译结果的尺寸
+
+(4) 配置构建工具以支持 React JSX/TSX
 
 - 如果之前的项目基于 webpack：
 
@@ -89,7 +98,7 @@ npm install -D @types/react @types/react-dom
   });
   ```
 
-(4) 配置 tsconfig.json 以支持 JSX
+(5) 配置 tsconfig.json 以支持 JSX
 
 在 `tsconfig.json` 中添加或修改以下配置：
 
@@ -102,7 +111,7 @@ npm install -D @types/react @types/react-dom
 }
 ```
 
-(5) 使用 React 挂载到面板元素
+(6) 使用 React 挂载到面板元素
 
 入口文件 index.ts 中 **不能使用 JSX 语法**（因为它是 `.ts` 而非 `.tsx`），需要使用 `createElement` 代替：
 
@@ -141,7 +150,7 @@ npm install -D @types/react @types/react-dom
   ReactDOM.render(createElement(SubPanel), newPanel);
   ```
 
-(6) 创建一个示例组件
+(7) 创建一个示例组件
 
 SubPanel.tsx（组件文件使用 `.tsx` 后缀，可以正常使用 JSX 语法）:
 
@@ -161,7 +170,7 @@ export default function SubPanel() {
 }
 ```
 
-(7) (可选, 推荐) 避免 ts 不认识 `.tsx` 组件的默认导出
+(8) (可选, 推荐) 避免 ts 不认识 `.tsx` 组件的默认导出
 
 当编译和运行一切都正常时，你的 IDE 代码编辑器可能也会在 index.ts 中飘红，
 `import SubPanel from './SubPanel'` 提示: `找不到模块"./SubPanel"或其相应的类型声明。ts(2307)`
@@ -176,7 +185,7 @@ export default function SubPanel() {
 
 同时确保 `tsconfig.json` 中的 `compilerOptions` 包含步骤 (4) 中的 `"jsx": "react-jsx"` 配置。
 
-(8) (可选) 卸载时清理 React 组件
+(9) (可选) 卸载时清理 React 组件
 
 当插件被禁用或卸载时，应当正确清理 React 渲染树以避免内存泄漏：
 
@@ -194,7 +203,7 @@ export default function SubPanel() {
   ReactDOM.unmountComponentAtNode(newPanel);
   ```
 
-(9) (可选) React 18 与 React 17 及更早的一些差异
+(10) (可选) React 18 与 React 17 及更早的一些差异
 
 该项目使用的是 React 18+，版本 18 和 17 的一些用法有些不同
 

@@ -18,5 +18,10 @@ export default defineConfig({
     outDir: 'dist',
     minify: false, // (可选)
   },
+  define: { // 无 node 环境
+    'process.env.NODE_ENV': JSON.stringify('production'),
+    'process.env': {},
+    'process': {},
+  },
   plugins: [react()],
 });
