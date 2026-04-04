@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   build: {
@@ -17,4 +18,5 @@ export default defineConfig({
     outDir: 'dist',
     minify: false, // (可选)
   },
+  plugins: [react()],
 });

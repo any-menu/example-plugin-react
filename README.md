@@ -104,11 +104,12 @@ npm install -D @types/react @types/react-dom
 
 (5) 使用 React 挂载到面板元素
 
-假设面板入口文件为 index.ts：
+入口文件 index.ts 中 **不能使用 JSX 语法**（因为它是 `.ts` 而非 `.tsx`），需要使用 `createElement` 代替：
 
 - React 18+ 写法 (推荐):
 
-  ```tsx
+  ```ts
+  import { createElement } from 'react';
   import { createRoot } from 'react-dom/client';
   import SubPanel from './SubPanel';
 
@@ -118,14 +119,15 @@ npm install -D @types/react @types/react-dom
     el: newPanel
   });
 
-  // 使用 React 渲染
+  // 使用 React 渲染（在 .ts 中不能写 JSX，需用 createElement）
   const root = createRoot(newPanel);
-  root.render(<SubPanel />);
+  root.render(createElement(SubPanel));
   ```
 
 - React 17 及更早写法:
 
-  ```tsx
+  ```ts
+  import { createElement } from 'react';
   import ReactDOM from 'react-dom';
   import SubPanel from './SubPanel';
 
@@ -135,13 +137,13 @@ npm install -D @types/react @types/react-dom
     el: newPanel
   });
 
-  // 使用 React 渲染
-  ReactDOM.render(<SubPanel />, newPanel);
+  // 使用 React 渲染（在 .ts 中不能写 JSX，需用 createElement）
+  ReactDOM.render(createElement(SubPanel), newPanel);
   ```
 
 (6) 创建一个示例组件
 
-SubPanel.tsx:
+SubPanel.tsx（组件文件使用 `.tsx` 后缀，可以正常使用 JSX 语法）:
 
 ```tsx
 import { useState } from 'react';
@@ -159,7 +161,22 @@ export default function SubPanel() {
 }
 ```
 
-(7) (可选) 卸载时清理 React 组件
+(7) (可选, 推荐) 避免 ts 不认识 `.tsx` 组件的默认导出
+
+当编译和运行一切都正常时，你的 IDE 代码编辑器可能也会在 index.ts 中飘红，
+`import SubPanel from './SubPanel'` 提示: `找不到模块"./SubPanel"或其相应的类型声明。ts(2307)`
+
+这是因为 tsconfig.json 中未包含 `.tsx` 文件的解析。确保 tsconfig.json 的 `include` 中包含 tsx 文件：
+
+```json
+{
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
+}
+```
+
+同时确保 `tsconfig.json` 中的 `compilerOptions` 包含步骤 (4) 中的 `"jsx": "react-jsx"` 配置。
+
+(8) (可选) 卸载时清理 React 组件
 
 当插件被禁用或卸载时，应当正确清理 React 渲染树以避免内存泄漏：
 
@@ -177,7 +194,7 @@ export default function SubPanel() {
   ReactDOM.unmountComponentAtNode(newPanel);
   ```
 
-(8) (可选) React 18 与 React 17 及更早的一些差异
+(9) (可选) React 18 与 React 17 及更早的一些差异
 
 该项目使用的是 React 18+，版本 18 和 17 的一些用法有些不同
 
@@ -186,12 +203,12 @@ export default function SubPanel() {
   ```js
   import { createRoot } from 'react-dom/client';
   const root = createRoot(container);
-  root.render(<App />);
+  root.render(createElement(App));
   ```
 - React 17 及更早
   ```js
   import ReactDOM from 'react-dom';
-  ReactDOM.render(<App />, container);
+  ReactDOM.render(createElement(App), container);
   ```
 
 React 18 引入了并发特性 (Concurrent Features)，使用 `createRoot` 是启用这些新特性的前提。如果使用旧的 `ReactDOM.render`，React 18 会以兼容模式 (legacy mode) 运行，不会启用并发特性。

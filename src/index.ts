@@ -15,6 +15,10 @@ import cssText from './style.css?inline';
 
 import type { PluginInterface, PluginInterfaceCtx } from '../types/any-menu';
 
+import { createElement } from 'react';
+import { createRoot } from 'react-dom/client';
+import SubPanel from './SubPanel.jsx';
+
 let cache_ctx: PluginInterfaceCtx | undefined
 
 export default class ExamplePluginSimple implements PluginInterface {
@@ -42,11 +46,16 @@ export default class ExamplePluginSimple implements PluginInterface {
     // 注册面板示例
     if (!cache_ctx) {
       cache_ctx = ctx
-      const newPanel = document.createElement('div'); newPanel.innerText = 'New Panel Content';
+      const newPanel = document.createElement('div');
       ctx.api.registerSubPanel({
           id: 'example-plugin-react-panel',
           el: newPanel
       })
+
+      // 使用 React 渲染
+      const root = createRoot(newPanel);
+      root.render(createElement(SubPanel));
+      // root.render(<SubPanel />); // （在 .ts 中不能写 JSX，需用 createElement。但如果你的入口是 tsx，你可以用这种写法）
     }
 
     // 文本输出示例
