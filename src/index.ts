@@ -13,7 +13,7 @@
 // 功能: 可以将 CSS 内联到 JS 中，插件只需分发单个 .js 文件
 import cssText from './style.css?inline';
 
-import type { PluginInterface, PluginInterfaceCtx } from '../types/any-menu';
+import type { PluginInterface, PluginInterfaceCtx } from 'any-menu';
 
 import { createElement } from 'react';
 import { createRoot } from 'react-dom/client';
