@@ -12,11 +12,7 @@ $ npm run build
 
 ## 使用
 
-同普通的 AnyMenu 插件
-
-将编译好的结果放置于 AnyMenu 的插件目录下，然后 AnyMenu 中刷新本地插件列表即可看到刚刚添加的新插件
-
-将新插件开启后即可 (当前版本可能需要重启下插件/软件才可)
+见: [any-menu/example-plugin-simple 使用](https://github.com/any-menu/example-plugin-simple?tab=readme-ov-file#%E4%BD%BF%E7%94%A8)
 
 ## 从零生成此项目 (可选)
 

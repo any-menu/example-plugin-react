@@ -36,6 +36,8 @@ jobs:
     if: github.event_name == 'push' # no pr
     needs: [build]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # 允许无需 PAT 创建 Release
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
@@ -51,11 +53,12 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         uses: ncipollo/release-action@v1
         with:
-          token: ${{ secrets.Your_token_secrets_name }} # GitHub Token，不填报错: `Error: Error undefined: Parameter token or opts.auth is required`
+          # token: ${{ secrets.Your_token_secrets_name }} # PAT GitHub Token。可选一，换成你的PAT，否则报错: `Error: Error undefined: Parameter token or opts.auth is required`
+          token: ${{ secrets.GITHUB_TOKEN }} # 内置 Github Token。可选二
           name: 'Release ${{ github.ref_name }}'
           body: 'Release for tag ${{ github.ref_name }}'
           artifacts: |
-            ./dist/main.js
+            ./dist/plugin-build/main.js
           generateReleaseNotes: false # 自动根据 commits 生成 release notes。此外，这里应该导向一个更新日志页
           prerelease: ${{ endsWith(github.ref_name, 'beta') }} # 是否预发布
           makeLatest: ${{ !endsWith(github.ref_name, 'beta') }} # 是否最后一个版本
